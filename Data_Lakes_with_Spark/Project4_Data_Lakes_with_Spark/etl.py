@@ -54,7 +54,6 @@ def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
     # Song data: s3://udacity-dend/song_data
     song_data = input_data + 'song_data/*/*/*/*.json'
-#     song_data = input_data + 'song_data/A/A/*/*.json'
     
     # read song data file
     print("Step 1: Loading data to Spark")
@@ -75,9 +74,6 @@ def process_song_data(spark, input_data, output_data):
         ).distinct()
     )
     
-#     songs_table.printSchema()
-#     songs_table.show(5)
-    
     # write songs table to parquet files partitioned by year and artist
     songs_table.write.partitionBy("year", "artist_id").parquet(output_data + 'songs/', mode="overwrite")
     
@@ -91,9 +87,6 @@ def process_song_data(spark, input_data, output_data):
                       "artist_latitude as latitude",
                       "artist_longitude as longitude"]
     artists_table = df.selectExpr(artists_fields).dropDuplicates()
-    
-#     artists_table.printSchema()
-#     artists_table.show(5)
 
     # write artists table to parquet files
     artists_table.write.parquet(output_data + 'artists/', mode="overwrite")
@@ -124,7 +117,6 @@ def process_log_data(spark, input_data, output_data):
     # Log data: s3://udacity-dend/log_data
     print("Step 1: Loading data to Spark")
     log_data = input_data + 'log_data/*/*/*.json'
-#     log_data = input_data + 'log_data/*/*/*2018*.json'
 
     # read log data file 
     df = spark.read.json(log_data)
@@ -149,16 +141,6 @@ def process_log_data(spark, input_data, output_data):
                               FROM log_data_table
                              WHERE userId IS NOT NULL
                         """)
-#     users_fields = ["userId as user_id",
-#                     "firstName as first_name",
-#                     "lastName as last_name",
-#                     "gender",
-#                     "level"
-#                    ]
-#     users_table = df.selectExpr(users_fields).dropDuplicates()
-    
-#     users_table.printSchema()
-#     users_table.show(5)
     
     # write users table to parquet files
     users_table.write.parquet(output_data + "users/", mode="overwrite")
@@ -183,16 +165,16 @@ def process_log_data(spark, input_data, output_data):
                             ) logDT
                         """)
     
-#     time_table.printSchema()
-#     time_table.show(5)
-    
     # write time table to parquet files partitioned by year and month
     time_table.write.partitionBy("year", "month").parquet(output_data + 'time/', mode="overwrite")
     print("  Step 2-2: time_table is written back to {}.", output_data + "time/")
 
-    # extract columns from joined song and log datasets to create songplays table
-    # Noticed: since the there is NO song_id & artist_Id in log_data
-    #          we can only join the table via artist_name & son_title as below
+
+    """
+    extract columns from joined song and log datasets to create songplays table
+    Noticed: since the there is NO song_id & artist_Id in log_data
+             we can only join the table via artist_name & son_title as below
+    """
     songplays_table = spark.sql("""
         SELECT 
         	   monotonically_increasing_id() as songplay_id,
@@ -211,9 +193,6 @@ def process_log_data(spark, input_data, output_data):
             ON logDT.artist = songDT.artist_name 
            AND logDT.song = songDT.title
     """)
-    
-#     songplays_table.printSchema()
-#     songplays_table.show(5)
                     
     songplays_table.write.parquet(output_data + "songplays/", mode="overwrite")
     print("  Step 2-3: songplays_table is written back to {}.", output_data + "songplays/")
