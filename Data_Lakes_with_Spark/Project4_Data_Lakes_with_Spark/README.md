@@ -73,3 +73,10 @@ AWS_SECRET_ACCESS_KEY=
 
 3. Open Terminal and Run **etl.py** in console for deploy Spark process and start loading data from S3 to to Spark and inserting processed result into fact table and dimension tables at S3.<br>
   `$ python etl.py`
+
+  You can check the result at S# as the snapshot below.
+  <br><br>
+  ![DER](https://raw.githubusercontent.com/TingHuanClay/Udacity_DataEngineeringNanoDegree/master/Data_Lakes_with_Spark/Project4_Data_Lakes_with_Spark/Result-Snapshot-S3.png)
+
+  Also some printed message at terminal to see the progress of the job.
+  ![DER](https://raw.githubusercontent.com/TingHuanClay/Udacity_DataEngineeringNanoDegree/master/Data_Lakes_with_Spark/Project4_Data_Lakes_with_Spark/Result-Snapshot-console.png)
