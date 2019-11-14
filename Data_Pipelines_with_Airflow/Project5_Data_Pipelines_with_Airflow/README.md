@@ -2,11 +2,13 @@
 ---
 ## Introduction
 
-A music streaming startup, Sparkify, has grown their user base and song database even more and want to move their data warehouse to a data lake. Their data resides in S3, in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.
+A music streaming company, Sparkify, has decided that it is time to introduce more automation and monitoring to their data warehouse ETL pipelines and come to the conclusion that the best tool to achieve this is Apache Airflow.
 
-As their data engineer, you are tasked with building an ETL pipeline that extracts their data from S3, processes them using Spark, and loads the data back into S3 as a set of dimensional tables. This will allow their analytics team to continue finding insights in what songs their users are listening to.
+They have decided to bring you into the project and expect you to create high grade data pipelines that are dynamic and built from reusable tasks, can be monitored, and allow easy backfills. They have also noted that the data quality plays a big part when analyses are executed on top the data warehouse and want to run tests against their datasets after the ETL steps have been executed to catch any discrepancies in the datasets.
 
-Developer is responsible for knowledge on Spark and data lakes to build an ETL pipeline for a data lake hosted on S3. To complete the project, you will need to load data from S3, process the data into analytics tables using Spark, and load them back into S3. You'll deploy this Spark process on a cluster using AWS.
+The source data resides in S3 and needs to be processed in Sparkify's data warehouse in Amazon Redshift. The source datasets consist of JSON logs that tell about user activity in the application and JSON metadata about the songs the users listen to.
+
+Developer is responsible for completing the Apache Airflow project, you will need to create your own custom operators to perform tasks such as staging the data, filling the data warehouse, and running checks on the data as the final step.
 
 ### Data Sets
 Developer will be working with two datasets that reside in S3. Here are the S3 links for each:
@@ -97,7 +99,7 @@ Conn Type: Postgres
 
 Host: Enter the endpoint of your Redshift cluster, excluding the port at the end.
 You can find this by selecting your cluster in the Clusters page of the Amazon Redshift console.
-See where this is located in the screenshot below. 
+See where this is located in the screenshot below.
 [IMPORTANT] Make sure to NOT include the port at the end of the Redshift endpoint string.
 
 Schema: Enter dev. This is the Redshift database you want to connect to.
