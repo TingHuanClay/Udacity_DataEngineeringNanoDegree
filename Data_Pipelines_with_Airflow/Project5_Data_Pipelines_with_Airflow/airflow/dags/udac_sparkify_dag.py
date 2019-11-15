@@ -19,8 +19,8 @@ start_date = datetime.utcnow()
 """
 default_args = {
     'owner': 'udacity_sparkify',
-    'start_date': datetime(2018, 1, 1),
-    'end_date': datetime(2018, 1, 2),
+    'start_date': datetime(2018, 11, 1),
+    'end_date': datetime(2018, 11, 3),
     'depends_on_past': False,
     'retries': 3,
     'retry_delay': timedelta(minutes=5),
@@ -28,12 +28,12 @@ default_args = {
     'email_on_retry': False
 }
 
-dag = DAG('udac_sparkify_dag',
+dag = DAG('udac_sparkify_dag_1',
           default_args=default_args,
           description='Load and transform data from S3 to Redshift with Airflow',
-#           schedule_interval='0 * * * *',
-          schedule_interval='@monthly',
-          max_active_runs=3
+          schedule_interval='@hourly',
+#           schedule_interval='@monthly',
+          max_active_runs=1
         )
 
 start_operator = DummyOperator(task_id='Begin_execution',  dag=dag)
@@ -98,27 +98,37 @@ create_dim_users_table = CreateTablesOperator(
 
 dummy_operator = DummyOperator(task_id='Dummy_After_CreateTable',  dag=dag)
 
+
 stage_events_to_redshift = StageToRedshiftOperator(
     task_id='Stage_events',
     dag=dag,
+    provide_context=True,
     table="staging_events",
     redshift_conn_id="redshift",
     aws_credentials_id="aws_credentials",
     s3_bucket="udacity-dend",
     s3_key="log_data",
+    region="us-west-2",
+    file_format="JSON",
+    run_by_execution_date=True,
     json_path="s3://udacity-dend/log_json_path.json"
 )
+
 
 stage_songs_to_redshift = StageToRedshiftOperator(
     task_id='Stage_songs',
     dag=dag,
-
+    provide_context=True,
     table="staging_songs",
     redshift_conn_id="redshift",
     aws_credentials_id="aws_credentials",
     s3_bucket="udacity-dend",
-    s3_key="song_data"
+    s3_key="song_data",
+    region="us-west-2",
+    file_format="JSON",
+    run_by_execution_date=False
 )
+
 
 
 load_songplays_table = LoadFactOperator(
@@ -169,7 +179,8 @@ run_quality_checks = DataQualityOperator(
     task_id='Run_data_quality_checks',
     dag=dag,
     redshift_conn_id='redshift',
-    tables=["songplays", "users", "songs", "artists", "time"]
+    tables=["songplays", "users", "songs", "artists", "time"],
+    select_query=SqlQueries.data_quality_check
 )
 
 end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
@@ -177,6 +188,7 @@ end_operator = DummyOperator(task_id='Stop_execution',  dag=dag)
 #
 # Define task ordering for the DAG tasks you defined
 #
+
 
 start_operator >> [create_staging_event_table, create_staging_song_table,
                    create_fact_songplays_table,
